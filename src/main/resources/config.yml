@@ -1,0 +1,27 @@
+# ==================================================
+#                   DayUtils - Config
+# ==================================================
+
+messages:
+  no-permission: "&#FF5555¡No tienes permiso para hacer esto!"
+  player-not-found: "&#FF5555¡Ese jugador no está conectado!"
+  only-players: "&#FF5555Este comando solo lo puede usar un jugador."
+  usage-nightvision: "&#FF5555Uso: /du nightvision <on/off>"
+  usage-invsee: "&#FF5555Uso: /du invsee <jugador>"
+
+nightvision:
+  activated: "&#00DAFF¡Activaste el efecto de Visión Nocturna!"
+  deactivated: "&#00DAFF¡Desactivaste el efecto de Visión Nocturna!"
+  check-interval-ticks: 100
+
+lockchat:
+  blocked-message: "&#FF5555¡El chat está bloqueado por el staff!"
+  title: "&#00DAFF&lD&#0FDDFF&lA&#1EE0FF&lY&#2DE3FF&lU&#3CE6FF&lT&#50EAFF&lI&#64EDFF&lL&#78F1FF&lS"
+  subtitle-lock: "&#00DAFF¡{player} ha desactivado el chat! 🏹"
+  subtitle-unlock: "&#00DAFF¡{player} ha activado el chat! 🏹"
+  title-fade-in: 10
+  title-stay: 60
+  title-fade-out: 10
+
+invsee:
+  title: "Inventario de {player}"
