@@ -1,0 +1,29 @@
+name: DayUtils
+version: '1.0.0'
+main: com.dayutils.plugin.DayUtils
+api-version: '1.20'
+author: Bughatti
+description: Plugin de utilidades varias para staff (nightvision, invsee, lockchat)
+
+commands:
+  dayutils:
+    description: Comando principal de DayUtils
+    aliases: [du, dutils]
+    usage: /<command> <nightvision|invsee|lockchat|unlockchat> [jugador|on/off]
+
+permissions:
+  dayutils.admin:
+    description: Acceso total a DayUtils
+    default: op
+  dayutils.nightvision:
+    description: Permite usar /du nightvision
+    default: op
+  dayutils.invsee:
+    description: Permite usar /du invsee
+    default: op
+  dayutils.lockchat:
+    description: Permite usar /du lockchat y /du unlockchat
+    default: op
+  dayutils.bypass.lockchat:
+    description: Permite hablar aunque el chat esté bloqueado
+    default: op
