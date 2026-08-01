@@ -25,3 +25,12 @@ lockchat:
 
 invsee:
   title: "Inventario de {player}"
+
+actions:
+  healed-self: "&#00DAFF¡Te has curado!"
+  healed-other: "&#00DAFF¡Has curado a {player}!"
+  fed-self: "&#00DAFF¡Has saciado tu hambre!"
+  fed-other: "&#00DAFF¡Has saciado el hambre de {player}!"
+  repaired-self: "&#00DAFF¡Reparaste el ítem en tu mano!"
+  repaired-other: "&#00DAFF¡Reparaste el ítem en la mano de {player}!"
+  no-item-in-hand: "&#FF5555¡No tienes ningún ítem en la mano para reparar!"
