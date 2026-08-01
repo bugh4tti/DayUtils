@@ -9,7 +9,7 @@ commands:
   dayutils:
     description: Comando principal de DayUtils
     aliases: [du, dutils]
-    usage: /<command> <nightvision|invsee|lockchat|unlockchat> [jugador|on/off]
+    usage: /<command> <nightvision|invsee|lockchat|unlockchat|heal|feed|repair> [jugador|on/off]
 
 permissions:
   dayutils.admin:
@@ -26,4 +26,13 @@ permissions:
     default: op
   dayutils.bypass.lockchat:
     description: Permite hablar aunque el chat esté bloqueado
+    default: op
+  dayutils.heal:
+    description: Permite usar /du heal
+    default: op
+  dayutils.feed:
+    description: Permite usar /du feed
+    default: op
+  dayutils.repair:
+    description: Permite usar /du repair
     default: op
