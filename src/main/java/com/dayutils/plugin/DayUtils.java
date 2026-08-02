@@ -3,8 +3,10 @@ package com.dayutils.plugin;
 import com.dayutils.plugin.commands.DayUtilsCommand;
 import com.dayutils.plugin.listeners.ChatLockListener;
 import com.dayutils.plugin.listeners.NightVisionListener;
+import com.dayutils.plugin.listeners.SeenListener;
 import com.dayutils.plugin.utils.ChatLockManager;
 import com.dayutils.plugin.utils.NightVisionManager;
+import com.dayutils.plugin.utils.SeenManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,6 +16,7 @@ public final class DayUtils extends JavaPlugin {
 
     private ChatLockManager chatLockManager;
     private NightVisionManager nightVisionManager;
+    private SeenManager seenManager;
 
     @Override
     public void onEnable() {
@@ -23,6 +26,7 @@ public final class DayUtils extends JavaPlugin {
 
         this.chatLockManager = new ChatLockManager();
         this.nightVisionManager = new NightVisionManager();
+        this.seenManager = new SeenManager();
 
         DayUtilsCommand command = new DayUtilsCommand(this);
         getCommand("dayutils").setExecutor(command);
@@ -30,6 +34,7 @@ public final class DayUtils extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new ChatLockListener(this), this);
         Bukkit.getPluginManager().registerEvents(new NightVisionListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new SeenListener(this), this);
 
         long interval = getConfig().getLong("nightvision.check-interval-ticks", 100L);
         Bukkit.getScheduler().runTaskTimer(this, () -> {
@@ -59,4 +64,8 @@ public final class DayUtils extends JavaPlugin {
     public NightVisionManager getNightVisionManager() {
         return nightVisionManager;
     }
+
+    public SeenManager getSeenManager() {
+        return seenManager;
     }
+}
