@@ -3,7 +3,9 @@ package com.dayutils.plugin.commands;
 import com.dayutils.plugin.DayUtils;
 import com.dayutils.plugin.utils.ColorUtils;
 import com.dayutils.plugin.utils.NightVisionApplier;
+import com.dayutils.plugin.utils.TimeUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,6 +21,12 @@ import java.util.List;
 
 public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
 
+    private static final List<String> SUBCOMMANDS = List.of(
+            "nightvision", "invsee", "lockchat", "unlockchat", "heal", "feed", "repair",
+            "reload", "help", "enderchest", "ec", "clearinv", "sudo", "broadcast", "title",
+            "seen", "ping"
+    );
+
     private final DayUtils plugin;
 
     public DayUtilsCommand(DayUtils plugin) {
@@ -28,7 +36,7 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(ColorUtils.translate("&#00DAFF&lDayUtils &7» &fUsa /du <nightvision|invsee|lockchat|unlockchat|heal|feed|repair>"));
+            sendHelp(sender);
             return true;
         }
 
@@ -42,7 +50,16 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
             case "heal" -> handleHeal(sender, args);
             case "feed" -> handleFeed(sender, args);
             case "repair" -> handleRepair(sender, args);
-            default -> sender.sendMessage(ColorUtils.translate("&#FF5555Subcomando desconocido. Usa /du <nightvision|invsee|lockchat|unlockchat|heal|feed|repair>"));
+            case "reload" -> handleReload(sender);
+            case "help" -> sendHelp(sender);
+            case "enderchest", "ec" -> handleEnderchest(sender, args);
+            case "clearinv" -> handleClearInv(sender, args);
+            case "sudo" -> handleSudo(sender, args);
+            case "broadcast" -> handleBroadcast(sender, args);
+            case "title" -> handleTitle(sender, args);
+            case "seen" -> handleSeen(sender, args);
+            case "ping" -> handlePing(sender, args);
+            default -> sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.unknown-subcommand")));
         }
 
         return true;
@@ -55,7 +72,7 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.only-players")));
             return;
         }
-        if (!player.hasPermission("dayutils.nightvision")) {
+        if (!player.hasPermission("dayutils.command.nightvision")) {
             player.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
             return;
         }
@@ -84,7 +101,7 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.only-players")));
             return;
         }
-        if (!player.hasPermission("dayutils.invsee")) {
+        if (!player.hasPermission("dayutils.command.invsee")) {
             player.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
             return;
         }
@@ -105,7 +122,7 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
     // ================== LOCKCHAT / UNLOCKCHAT ==================
 
     private void handleLockChat(CommandSender sender, boolean lock) {
-        if (!sender.hasPermission("dayutils.lockchat")) {
+        if (!sender.hasPermission("dayutils.command.lockchat")) {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
             return;
         }
@@ -136,28 +153,23 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
     // ================== HEAL ==================
 
     private void handleHeal(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("dayutils.heal")) {
+        if (!sender.hasPermission("dayutils.command.heal")) {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
             return;
         }
 
         Player target = resolveTarget(sender, args);
-        if (target == null) {
-            return;
-        }
+        if (target == null) return;
 
         double maxHealth = target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
         target.setHealth(maxHealth);
         target.setFireTicks(0);
 
         boolean self = sender instanceof Player p && p.getUniqueId().equals(target.getUniqueId());
-
         if (self) {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.healed-self")));
         } else {
-            sender.sendMessage(ColorUtils.translate(
-                    plugin.getConfig().getString("actions.healed-other").replace("{player}", target.getName())
-            ));
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.healed-other").replace("{player}", target.getName())));
             target.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.healed-self")));
         }
     }
@@ -165,27 +177,22 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
     // ================== FEED ==================
 
     private void handleFeed(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("dayutils.feed")) {
+        if (!sender.hasPermission("dayutils.command.feed")) {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
             return;
         }
 
         Player target = resolveTarget(sender, args);
-        if (target == null) {
-            return;
-        }
+        if (target == null) return;
 
         target.setFoodLevel(20);
         target.setSaturation(20f);
 
         boolean self = sender instanceof Player p && p.getUniqueId().equals(target.getUniqueId());
-
         if (self) {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.fed-self")));
         } else {
-            sender.sendMessage(ColorUtils.translate(
-                    plugin.getConfig().getString("actions.fed-other").replace("{player}", target.getName())
-            ));
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.fed-other").replace("{player}", target.getName())));
             target.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.fed-self")));
         }
     }
@@ -193,15 +200,13 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
     // ================== REPAIR ==================
 
     private void handleRepair(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("dayutils.repair")) {
+        if (!sender.hasPermission("dayutils.command.repair")) {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
             return;
         }
 
         Player target = resolveTarget(sender, args);
-        if (target == null) {
-            return;
-        }
+        if (target == null) return;
 
         ItemStack item = target.getInventory().getItemInMainHand();
         if (item == null || item.getType().isAir()) {
@@ -216,23 +221,241 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
         }
 
         boolean self = sender instanceof Player p && p.getUniqueId().equals(target.getUniqueId());
-
         if (self) {
             sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.repaired-self")));
         } else {
-            sender.sendMessage(ColorUtils.translate(
-                    plugin.getConfig().getString("actions.repaired-other").replace("{player}", target.getName())
-            ));
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.repaired-other").replace("{player}", target.getName())));
             target.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.repaired-self")));
         }
     }
 
+    // ================== RELOAD ==================
+
+    private void handleReload(CommandSender sender) {
+        if (!sender.hasPermission("dayutils.command.reload")) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+
+        plugin.reloadConfig();
+        sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("reload.success")));
+    }
+
+    // ================== HELP ==================
+
+    private void sendHelp(CommandSender sender) {
+        List<String> lines = List.of(
+                "&#00DAFF&lDayUtils &7» &fComandos disponibles:",
+                "&#00DAFF/du nightvision <on/off>",
+                "&#00DAFF/du invsee <jugador>",
+                "&#00DAFF/du lockchat &7| &#00DAFF/du unlockchat",
+                "&#00DAFF/du heal [jugador]",
+                "&#00DAFF/du feed [jugador]",
+                "&#00DAFF/du repair [jugador]",
+                "&#00DAFF/du enderchest (ec) [jugador]",
+                "&#00DAFF/du clearinv [jugador]",
+                "&#00DAFF/du sudo <jugador> <comando>",
+                "&#00DAFF/du broadcast <mensaje>",
+                "&#00DAFF/du title <mensaje>",
+                "&#00DAFF/du seen <jugador>",
+                "&#00DAFF/du ping <jugador>",
+                "&#00DAFF/du reload"
+        );
+        for (String line : lines) {
+            sender.sendMessage(ColorUtils.translate(line));
+        }
+    }
+
+    // ================== ENDERCHEST ==================
+
+    private void handleEnderchest(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.only-players")));
+            return;
+        }
+        if (!player.hasPermission("dayutils.command.enderchest")) {
+            player.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+
+        if (args.length < 2) {
+            player.openInventory(player.getEnderChest());
+            return;
+        }
+
+        Player target = Bukkit.getPlayerExact(args[1]);
+        if (target == null) {
+            player.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.player-not-found")));
+            return;
+        }
+
+        player.openInventory(target.getEnderChest());
+    }
+
+    // ================== CLEARINV ==================
+
+    private void handleClearInv(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("dayutils.command.clearinv")) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+
+        Player target = resolveTarget(sender, args);
+        if (target == null) return;
+
+        target.getInventory().clear();
+
+        boolean self = sender instanceof Player p && p.getUniqueId().equals(target.getUniqueId());
+        if (self) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.cleared-inv-self")));
+        } else {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.cleared-inv-other").replace("{player}", target.getName())));
+            target.sendMessage(ColorUtils.translate(plugin.getConfig().getString("actions.cleared-inv-target")));
+        }
+    }
+
+    // ================== SUDO ==================
+
+    private void handleSudo(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("dayutils.command.sudo")) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+        if (args.length < 3) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.usage-sudo")));
+            return;
+        }
+
+        Player target = Bukkit.getPlayerExact(args[1]);
+        if (target == null) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.player-not-found")));
+            return;
+        }
+
+        String cmd = String.join(" ", List.of(args).subList(2, args.length));
+        target.performCommand(cmd);
+
+        sender.sendMessage(ColorUtils.translate(
+                plugin.getConfig().getString("sudo.executed")
+                        .replace("{player}", target.getName())
+                        .replace("{command}", cmd)
+        ));
+    }
+
+    // ================== BROADCAST ==================
+
+    private void handleBroadcast(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("dayutils.command.broadcast")) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+        if (args.length < 2) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.usage-broadcast")));
+            return;
+        }
+
+        String message = String.join(" ", List.of(args).subList(1, args.length));
+        String formatted = ColorUtils.translate(
+                plugin.getConfig().getString("broadcast.format").replace("{message}", message)
+        );
+
+        Bukkit.broadcastMessage(formatted);
+    }
+
+    // ================== TITLE ==================
+
+    private void handleTitle(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("dayutils.command.title")) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+        if (args.length < 2) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.usage-title")));
+            return;
+        }
+
+        String raw = String.join(" ", List.of(args).subList(1, args.length));
+        String message = ColorUtils.translate(raw);
+
+        int fadeIn = plugin.getConfig().getInt("title.fade-in", 10);
+        int stay = plugin.getConfig().getInt("title.stay", 70);
+        int fadeOut = plugin.getConfig().getInt("title.fade-out", 10);
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            online.sendTitle(message, "", fadeIn, stay, fadeOut);
+        }
+    }
+
+    // ================== SEEN ==================
+
+    private void handleSeen(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("dayutils.command.seen")) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+        if (args.length < 2) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.usage-seen")));
+            return;
+        }
+
+        Player online = Bukkit.getPlayerExact(args[1]);
+        if (online != null) {
+            sender.sendMessage(ColorUtils.translate(
+                    plugin.getConfig().getString("seen.online").replace("{player}", online.getName())
+            ));
+            return;
+        }
+
+        @SuppressWarnings("deprecation")
+        OfflinePlayer offline = Bukkit.getOfflinePlayer(args[1]);
+
+        if (!offline.hasPlayedBefore()) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("seen.never")));
+            return;
+        }
+
+        Long lastQuit = plugin.getSeenManager().getLastQuit(offline.getUniqueId());
+        long lastMillis = lastQuit != null ? lastQuit : offline.getLastPlayed();
+        String time = TimeUtils.formatSince(lastMillis);
+
+        sender.sendMessage(ColorUtils.translate(
+                plugin.getConfig().getString("seen.offline")
+                        .replace("{player}", offline.getName())
+                        .replace("{time}", time)
+        ));
+    }
+
+    // ================== PING ==================
+
+    private void handlePing(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("dayutils.command.ping")) {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.no-permission")));
+            return;
+        }
+
+        Player target;
+        if (args.length >= 2) {
+            target = Bukkit.getPlayerExact(args[1]);
+            if (target == null) {
+                sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.player-not-found")));
+                return;
+            }
+        } else if (sender instanceof Player p) {
+            target = p;
+        } else {
+            sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.usage-ping")));
+            return;
+        }
+
+        sender.sendMessage(ColorUtils.translate(
+                plugin.getConfig().getString("ping.format")
+                        .replace("{player}", target.getName())
+                        .replace("{ping}", String.valueOf(target.getPing()))
+        ));
+    }
+
     // ================== UTIL ==================
 
-    /**
-     * Si se pasa un segundo argumento, busca ese jugador como objetivo.
-     * Si no, y el sender es un jugador, se usa a sí mismo.
-     */
     private Player resolveTarget(CommandSender sender, String[] args) {
         if (args.length >= 2) {
             Player target = Bukkit.getPlayerExact(args[1]);
@@ -242,11 +465,9 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
             }
             return target;
         }
-
         if (sender instanceof Player player) {
             return player;
         }
-
         sender.sendMessage(ColorUtils.translate(plugin.getConfig().getString("messages.only-players")));
         return null;
     }
@@ -256,27 +477,25 @@ public final class DayUtilsCommand implements CommandExecutor, TabCompleter {
         List<String> result = new ArrayList<>();
 
         if (args.length == 1) {
-            for (String option : List.of("nightvision", "invsee", "lockchat", "unlockchat", "heal", "feed", "repair")) {
+            for (String option : SUBCOMMANDS) {
                 if (option.startsWith(args[0].toLowerCase())) {
                     result.add(option);
                 }
             }
         } else if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("nightvision")) {
+            String sub = args[0].toLowerCase();
+            if (sub.equals("nightvision")) {
                 for (String option : List.of("on", "off")) {
-                    if (option.startsWith(args[1].toLowerCase())) {
-                        result.add(option);
-                    }
+                    if (option.startsWith(args[1].toLowerCase())) result.add(option);
                 }
-            } else if (List.of("invsee", "heal", "feed", "repair").contains(args[0].toLowerCase())) {
+            } else if (List.of("invsee", "heal", "feed", "repair", "enderchest", "ec",
+                    "clearinv", "sudo", "seen", "ping").contains(sub)) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
-                        result.add(p.getName());
-                    }
+                    if (p.getName().toLowerCase().startsWith(args[1].toLowerCase())) result.add(p.getName());
                 }
             }
         }
 
         return result;
     }
-        }
+                                                    }
