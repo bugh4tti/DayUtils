@@ -3,36 +3,63 @@ version: '1.0.0'
 main: com.dayutils.plugin.DayUtils
 api-version: '1.20'
 author: Bughatti
-description: Plugin de utilidades varias para staff (nightvision, invsee, lockchat)
+description: Plugin de utilidades varias para staff
 
 commands:
   dayutils:
     description: Comando principal de DayUtils
     aliases: [du, dutils]
-    usage: /<command> <nightvision|invsee|lockchat|unlockchat|heal|feed|repair> [jugador|on/off]
+    usage: /<command> <subcomando> [argumentos]
 
 permissions:
   dayutils.admin:
     description: Acceso total a DayUtils
     default: op
-  dayutils.nightvision:
-    description: Permite usar /du nightvision
-    default: op
-  dayutils.invsee:
-    description: Permite usar /du invsee
-    default: op
-  dayutils.lockchat:
-    description: Permite usar /du lockchat y /du unlockchat
-    default: op
   dayutils.bypass.lockchat:
     description: Permite hablar aunque el chat esté bloqueado
     default: op
-  dayutils.heal:
+  dayutils.command.nightvision:
+    description: Permite usar /du nightvision
+    default: op
+  dayutils.command.invsee:
+    description: Permite usar /du invsee
+    default: op
+  dayutils.command.lockchat:
+    description: Permite usar /du lockchat y /du unlockchat
+    default: op
+  dayutils.command.heal:
     description: Permite usar /du heal
     default: op
-  dayutils.feed:
+  dayutils.command.feed:
     description: Permite usar /du feed
     default: op
-  dayutils.repair:
+  dayutils.command.repair:
     description: Permite usar /du repair
     default: op
+  dayutils.command.reload:
+    description: Permite usar /du reload
+    default: op
+  dayutils.command.help:
+    description: Permite usar /du help
+    default: true
+  dayutils.command.enderchest:
+    description: Permite usar /du enderchest (ec)
+    default: op
+  dayutils.command.clearinv:
+    description: Permite usar /du clearinv
+    default: op
+  dayutils.command.sudo:
+    description: Permite usar /du sudo
+    default: op
+  dayutils.command.broadcast:
+    description: Permite usar /du broadcast
+    default: op
+  dayutils.command.title:
+    description: Permite usar /du title
+    default: op
+  dayutils.command.seen:
+    description: Permite usar /du seen
+    default: true
+  dayutils.command.ping:
+    description: Permite usar /du ping
+    default: true
