@@ -6,8 +6,14 @@ messages:
   no-permission: "&#FF5555¡No tienes permiso para hacer esto!"
   player-not-found: "&#FF5555¡Ese jugador no está conectado!"
   only-players: "&#FF5555Este comando solo lo puede usar un jugador."
+  unknown-subcommand: "&#FF5555Subcomando desconocido. Usa /du help para ver la lista."
   usage-nightvision: "&#FF5555Uso: /du nightvision <on/off>"
   usage-invsee: "&#FF5555Uso: /du invsee <jugador>"
+  usage-sudo: "&#FF5555Uso: /du sudo <jugador> <comando>"
+  usage-broadcast: "&#FF5555Uso: /du broadcast <mensaje>"
+  usage-title: "&#FF5555Uso: /du title <mensaje>"
+  usage-seen: "&#FF5555Uso: /du seen <jugador>"
+  usage-ping: "&#FF5555Uso: /du ping <jugador>"
 
 nightvision:
   activated: "&#00DAFF¡Activaste el efecto de Visión Nocturna!"
@@ -34,3 +40,28 @@ actions:
   repaired-self: "&#00DAFF¡Reparaste el ítem en tu mano!"
   repaired-other: "&#00DAFF¡Reparaste el ítem en la mano de {player}!"
   no-item-in-hand: "&#FF5555¡No tienes ningún ítem en la mano para reparar!"
+  cleared-inv-self: "&#00DAFF¡Vaciaste tu inventario!"
+  cleared-inv-other: "&#00DAFF¡Vaciaste el inventario de {player}!"
+  cleared-inv-target: "&#00DAFFTu inventario fue vaciado por el staff."
+
+reload:
+  success: "&#00DAFF¡Configuración recargada correctamente!"
+
+sudo:
+  executed: "&#00DAFFHiciste que {player} ejecute: {command}"
+
+broadcast:
+  format: "&#00DAFF&lDAYUTILS &7» &f{message}"
+
+title:
+  fade-in: 10
+  stay: 70
+  fade-out: 10
+
+seen:
+  online: "&#00DAFF{player} está conectado ahora mismo."
+  offline: "&#00DAFF{player} se conectó por última vez hace &f{time}&#00DAFF."
+  never: "&#FF5555Nunca se ha visto a ese jugador en este servidor."
+
+ping:
+  format: "&#00DAFF{player} tiene &f{ping}ms &#00DAFFde ping."
